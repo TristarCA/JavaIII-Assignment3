@@ -1,11 +1,14 @@
 package org.example.spring2025demo3rest.controllers;
 
+import org.example.spring2025demo3rest.dataaccess.HomeRepository;
 import org.example.spring2025demo3rest.dataaccess.UserRepository;
+import org.example.spring2025demo3rest.pojos.Home;
 import org.example.spring2025demo3rest.pojos.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 /**
@@ -13,10 +16,12 @@ import java.util.Optional;
  */
 @Controller
 @RequestMapping(path = RESTNouns.VERSION_1)
-public class UserController {
+public class MainController {
 
     //Wire the ORM
     @Autowired private UserRepository userRepository;
+    @Autowired
+    private HomeRepository homeRepository;
 
     /**
      * Get Mapping for all users
@@ -66,6 +71,13 @@ public class UserController {
         }
     }
 
+    /**
+     * Put mapping for user
+     * @param userId
+     * @param name
+     * @param email
+     * @return
+     */
     @PutMapping(path = RESTNouns.USER + RESTNouns.ID)
     public @ResponseBody String updateUser(
             @PathVariable("id") Long userId, @RequestParam String name, @RequestParam String email){
@@ -81,7 +93,55 @@ public class UserController {
             return "User with ID " + userId + " not found.";
         }
 
+    }
 
+    /**
+     * Get all homes for a specific User
+     */
+    @GetMapping(path = RESTNouns.USER +  RESTNouns.ID + RESTNouns.HOME)
+    public @ResponseBody Iterable<Home> getAllHomesByUser(@PathVariable("id") Long userId) {
+        Iterable<Home> homes = null;
+        if (userRepository.existsById(userId)) {
+            Optional<User> user = userRepository.findById(userId);
+            if(user.isPresent()){
+               // homeRepository
+
+                homes = homeRepository.getAllByUserId(userId);
+            }
+        }
+
+        //TODO handle errors
+
+        return homes;
+    }
+
+    /**
+     * Create a home for a user
+     * @param userId user id
+     * @param dateBuilt date built
+     * @param value value of the home as an int
+     * @return
+     */
+    @PostMapping(path = RESTNouns.USER + RESTNouns.ID + RESTNouns.HOME)
+    public @ResponseBody Home createHomeByUser(
+            @PathVariable("id") Long userId,
+            @RequestParam LocalDate dateBuilt, @RequestParam int value) {
+//
+        Home home = null;
+        if (userRepository.existsById(userId)) {
+            Optional<User> user = userRepository.findById(userId);
+
+            home = new Home();
+            home.setValue(value);
+            home.setDateBuilt(dateBuilt);
+            home.setUser(user.get());
+            homeRepository.save(home);
+
+        }
+
+        //TODO handle error codes
+
+        return home;
     }
 
 }
