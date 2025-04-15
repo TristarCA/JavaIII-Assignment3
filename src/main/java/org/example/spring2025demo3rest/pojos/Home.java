@@ -12,7 +12,8 @@ import java.time.LocalDate;
 @Entity
 public class Home {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @JsonFormat(pattern="yyyy-MM-dd")

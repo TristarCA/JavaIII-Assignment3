@@ -9,4 +9,7 @@ public class RESTNouns {
     public static final String USER = "/users";
     public static final String ID = "/{id}";
     public static final String HOME = "/homes";
+    public static final String HOME_ID = "/{homeId}";
+    public static final String AUTO = "/autos";
+    public static final String AUTO_ID = "/{autoId}";
 }
